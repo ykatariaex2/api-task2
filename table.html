@@ -1,0 +1,195 @@
+<html>
+
+<body>
+    <input type="text" id="nameSearch" name="fullName" placeholder="Search..." onkeyup="search()">
+    <select name="sort" id="sort">
+      <option value="ascend">ASCE</option>
+      <option value="descend">DESC</option>
+    </select>
+    <select name="options" id="option">
+      <option value="1">Name</option>
+      <option value="2">Gender</option>
+      <option value="3">Age</option>
+      <option value="4">State</option>
+      <option value="5">Country</option>
+    </select>
+    <button onclick="sort()"> SORT </button>
+
+    <div id-="container">
+        <table id="tb" border="2px" width="100%">
+           
+
+            <tr>
+                <th>image</th>
+                <th>name</th>
+                <th>gender</th>
+                <th>age</th>
+                <th>state</th>
+                <th>country</th>
+
+            </tr>
+
+        </table>
+       
+    </div>
+ 
+
+    <button onclick=getMoreData()>Data</button>
+    <script>
+       let page=1;
+       let results=20;
+       
+        function makeRequest() {
+            const url = `http://localhost:3000/?page=${page}&result=${results}`;
+            page+=1;
+            fetch(url).then(res => res.json()).then(data => {
+                
+         
+                createRow(data.results);
+              
+            })
+        }
+
+        function getMoreData(){
+            makeRequest();
+        }
+
+
+        function createRow(obj) {
+           
+
+            let mainTable = document.getElementById('tb');
+            for (let i in obj) {
+                let table_header_row = document.createElement('tr');
+             
+
+                let img = document.createElement("td");
+
+                let imgsrc = document.createElement("img");
+                imgsrc.src = obj[i].picture.thumbnail;
+                img.appendChild(imgsrc);
+                table_header_row.appendChild(img);
+
+                let name = document.createElement("td");
+                name.innerHTML = obj[i].name.first + obj[i].name.last;
+                table_header_row.appendChild(name);
+
+                let gender = document.createElement("td");
+                gender.innerHTML = obj[i].gender;
+                table_header_row.appendChild(gender);
+
+                let age = document.createElement("td");
+                age.innerHTML = obj[i].dob.age;
+                table_header_row.appendChild(age);
+
+                let state = document.createElement("td");
+                state.innerHTML = obj[i].location.state;
+                table_header_row.appendChild(state);
+
+                let country = document.createElement("td");
+                country.innerHTML = obj[i].location.country;
+                table_header_row.appendChild(country);
+
+                tb.appendChild(table_header_row);
+
+             
+
+            }
+        }
+       makeRequest();
+
+   
+
+
+
+       let table = document.getElementById("tb");
+
+       function search(){
+            let searchVal = document.getElementById('nameSearch').value.toLowerCase();
+            let trows = table.rows;
+            for(let i = 1; i < trows.length ; i++){
+                let cols = trows[i].getElementsByTagName('td');
+                let flag = false;
+                for(d of cols){
+                    colVal = d.textContent || d.innerText;
+                    if(colVal.toLowerCase().includes(searchVal)){
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag == false){
+                    trows[i].style.display = 'none';
+                }
+                else{
+                    trows[i].style.display = "";
+                }
+            }
+        }
+
+        function sort(){
+            console.log("Hello");
+            let clm = document.getElementById('option').value;
+            console.log(clm);
+            let sortOption = document.getElementById('sort').value;
+            console.log(sortOption);
+            if(sortOption == "ascend"){
+                // console.log("working",trows.length);
+                let switchs = true;
+                while(switchs){
+                    let trows = table.rows;
+                    switchs = false;
+                    let should=false;
+                    let i;
+                for(i = 1; i < (trows.length - 1); i++){
+                    let a = trows[i].getElementsByTagName('td');
+                    // console.log(a[3].innerHTML);
+                    let b = trows[i+1].getElementsByTagName('td');
+                        if(a[clm].innerHTML > b[clm].innerHTML){
+                            should = true;
+                            console.log(should);
+                            break;
+                        }
+                }
+                if(should){
+                    console.log("swap");
+                    trows[i].parentNode.insertBefore(trows[i+1],trows[i]);
+                    switchs = true;
+                }
+            }
+        }
+        else{
+            let switchs = true;
+            while(switchs){
+                let trows = table.rows;
+                switchs = false;
+                let should=false;
+                let i;
+            for(i = 1; i < (trows.length - 1); i++){
+                let a = trows[i].getElementsByTagName('td');
+                // console.log(a[3].innerHTML);
+                let b = trows[i+1].getElementsByTagName('td');
+                    if(a[clm].innerHTML < b[clm].innerHTML){
+                        should = true;
+                        break;
+                    }
+            }
+            if(should){
+                console.log("swap");
+                trows[i].parentNode.insertBefore(trows[i+1],trows[i]);
+                switchs = true;
+            }
+        }
+        }
+        }
+
+        
+       
+
+
+
+
+        makeRequest(url);
+    </script>
+</body>
+
+</html>
